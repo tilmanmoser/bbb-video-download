@@ -1,0 +1,23 @@
+{
+  "name": "bbb-recorder",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "image-size": "^0.8.3",
+    "jest": "^26.4.2",
+    "jest-image-snapshot": "^4.1.0"
+  },
+  "scripts": {
+    "process": "node index.js",
+    "test": "jest tests/ --coverage --verbose --force-exit"
+  },
+  "dependencies": {
+    "argparse": "^2.0.0",
+    "del": "^5.1.0",
+    "langs": "^2.0.0",
+    "mkdirp": "^1.0.4",
+    "svg-to-img": "^2.0.9",
+    "xml2js": "^0.4.23"
+  }
+}

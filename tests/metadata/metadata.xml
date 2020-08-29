@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<recording>
+  <id>9a9b6536a10b10017f7e849d30a026809852d01f-1598364581253</id>
+  <state>published</state>
+  <published>true</published>
+  <start_time>1598364581253</start_time>
+  <end_time>1598364606662</end_time>
+  <participants>1</participants>
+  <meeting id="9a9b6536a10b10017f7e849d30a026809852d01f-1598364581253" externalId="0v1xkcrre2la0vafauyepzfei16x2fkuhcfydvps" name="Featuredemo" breakout="false"/>
+  <meta>
+    <bbb-origin>Greenlight</bbb-origin>
+    <bbb-origin-server-name>meet.impavit.com</bbb-origin-server-name>
+    <bbb-origin-version>2.7.1</bbb-origin-version>
+    <gl-listed>false</gl-listed>
+    <isBreakout>false</isBreakout>
+    <meetingId>0v1xkcrre2la0vafauyepzfei16x2fkuhcfydvps</meetingId>
+    <meetingName>Featuredemo</meetingName>
+  </meta>
+  <playback>
+    <format>presentation</format>
+    <link>https://meet.impavit.com/playback/presentation/2.0/playback.html?meetingId=9a9b6536a10b10017f7e849d30a026809852d01f-1598364581253</link>
+    <processing_time>1752</processing_time>
+    <duration>9566</duration>
+    <size>109393</size>
+  </playback>
+  <raw_size>202479</raw_size>
+</recording>

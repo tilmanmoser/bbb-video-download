@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<recording id="deskshare_events">
+  <event start_timestamp="10.0" stop_timestamp="20.0" video_width="720" video_height="421"/>
+  <event start_timestamp="30.0" stop_timestamp="40.0" video_width="720" video_height="421"/>
+</recording>
