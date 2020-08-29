@@ -1,5 +1,5 @@
 # bbb-video-download
-A BigBlueButton recording postscript to provide video download capabilitis.
+A BigBlueButton recording postscript to provide video download capability.
 
 Tested with BigBlueButton v2.2.23.
 
