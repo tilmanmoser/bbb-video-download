@@ -67,7 +67,7 @@ class Processor {
 
     async cleanup() {
         try {
-            //deleteDir(this.workdir)
+            deleteDir(this.workdir)
         } catch (erorr) {
             console.error(error)
             throw new Error(error)
