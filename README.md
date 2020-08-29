@@ -1,6 +1,7 @@
 # bbb-video-download
-A BigBlueButton recording postscript to provide video download
-Tested with BigBlueButton v2.2.23
+A BigBlueButton recording postscript to provide video download capabilitis.
+
+Tested with BigBlueButton v2.2.23.
 
 ## Install
 This instruction assumes you run BigBlueButton v2.2 on Ubuntu 16.04 as described in the official [documentation](https://docs.bigbluebutton.org/2.2/install.html).
