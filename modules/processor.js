@@ -37,7 +37,7 @@ class Processor {
 
     async createAssets() {
         try {
-            this.workdir = './tmp/' + this.metadata.id
+            this.workdir = this.inputDir + '/assets'
             await createWorkdir(this.workdir)
             this.shapeFiles = await createShapes(this.shapes, this.workdir),
             this.captionFiles = await createCaptions(this.captions, this.inputDir, this.workdir)
