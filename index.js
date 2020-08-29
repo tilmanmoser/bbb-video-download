@@ -1,6 +1,6 @@
 const { ArgumentParser } = require('argparse')
 const { version } = require('./package.json')
-const { Processor } = require('./modules/Processor')
+const { Processor } = require('./modules/processor')
 
 const argsParser = new ArgumentParser()
 argsParser.add_argument('-v', '--version', {
