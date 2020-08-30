@@ -30,7 +30,6 @@ class Processor {
             if (fs.existsSync(this.inputDir + '/video/'))
                 this.webcamsVideo = this.inputDir + '/video/' + fs.readdirSync(this.inputDir + '/video/').values().next().value
         } catch (error) {
-            console.error(error)
             throw new Error(error)
         }
     }
@@ -48,7 +47,6 @@ class Processor {
             this.ffmetadataFile = this.workdir + '/ffmetadata.txt'
             await createFfMetadataFile(this.ffmetadataFile, this.metadata, this.shapes, this.deskshares)
         } catch (error) {
-            console.error(error)
             throw new Error(error)
         }
     }
@@ -58,7 +56,6 @@ class Processor {
             let cmd = await assembleFfmpegCmd(this)
             childProcess.execSync(cmd)
         } catch (error) {
-            console.error(error)
             throw new Error(error)
         }
 
@@ -68,12 +65,22 @@ class Processor {
         try {
             deleteDir(this.workdir)
         } catch (erorr) {
-            console.error(error)
             throw new Error(error)
         }
         
     }
  
+    async verify() {
+        try {
+            if (fs.existsSync(this.args.output))
+                console.log(`Success. Created ${this.args.output}`)
+            else    
+                console.log('Failed to create video')
+        } catch (erorr) {
+            throw new Error(error)
+        }
+    }
+
 }
 
 module.exports.Processor = Processor

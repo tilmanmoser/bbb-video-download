@@ -19,11 +19,16 @@ argsParser.add_argument('-o', '--output', {
 const args = argsParser.parse_args()
 
 async function process(args) {
-    const processor = new Processor(args)
-    await processor.configure()
-    await processor.createAssets()
-    await processor.createVideo()
-    await processor.cleanup()
+    try {
+        const processor = new Processor(args)
+        await processor.configure()
+        await processor.createAssets()
+        await processor.createVideo()
+        await processor.cleanup()
+        await processor.verify()
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 process(args)
