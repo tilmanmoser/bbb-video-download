@@ -20,3 +20,7 @@ rm node-v12.18.3-linux-x64.tar.xz
 # install post_publish script
 export BBB_VIDEO_DOWNLOAD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 envsubst < ./snippets/post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/post_publish_bbb_video_download.rb
+
+# change ownership
+chown bigbluebutton:bigbluebutton /usr/local/bigbluebutton/core/scripts/post_publish/post_publish_bbb_video_download.rb
+chown -r bigbluebutton:bigbluebutton ${BBB_VIDEO_DOWNLOAD_DIR} 
