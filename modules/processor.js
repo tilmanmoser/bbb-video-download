@@ -56,7 +56,6 @@ class Processor {
     async createVideo() {
         try {
             let cmd = await assembleFfmpegCmd(this)
-            console.log(cmd)
             childProcess.execSync(cmd)
         } catch (error) {
             console.error(error)
