@@ -4,7 +4,8 @@ A BigBlueButton recording postscript to provide video download capability.
 Tested with BigBlueButton v2.2.23.
 
 ## Install
-This instruction assumes you run BigBlueButton v2.2 on Ubuntu 16.04 as described in the official [documentation](https://docs.bigbluebutton.org/2.2/install.html).
+**IMPORTANT:** The provided install-script assumes you run BigBlueButton v2.2 on Ubuntu 16.04 as described in the official [documentation](https://docs.bigbluebutton.org/2.2/install.html); i.e. bbb specific folders like the installation directory (/usr/local/bigbluebutton), data directory (/var/bigbluebutton) and log directory (/var/log/bigbluebutton) are hard coded into the scripts.
+
 
 ```bash
 cd /opt
@@ -43,8 +44,5 @@ cd /opt/bbb-video-download
 ./node12/bin/node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o your-video.mp4
 ```
 
-
-
-
-
-
+### Troubleshooting
+Check /var/log/bigbluebutton/post_publish.log for errors.
