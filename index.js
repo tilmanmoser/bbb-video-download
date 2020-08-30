@@ -12,7 +12,7 @@ argsParser.add_argument('-i', '--input', {
 })
 
 argsParser.add_argument('-o', '--output', {
-    help: 'Outputfile .mp4|.webm',
+    help: 'Outputfile .mp4',
     required: true
 })
 

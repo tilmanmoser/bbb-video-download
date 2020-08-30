@@ -52,7 +52,7 @@ cd /opt/bbb-video-download
 >  -i INPUT, --input INPUT
 >                        Path to published presentation
 >  -o OUTPUT, --output OUTPUT
->                        Outputfile .mp4|.webm
+>                        Outputfile .mp4
 ```
 
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:
