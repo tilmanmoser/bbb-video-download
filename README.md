@@ -20,6 +20,7 @@ The installation script will
 * download node v12 binaries for linux x64 (as BBB only provides node v12).
 * install node_modules for bbb_video_download
 * copy a post_publish script, so that downloadable videos are created automatically
+* change the ownership of the installation directory and post script to bigbluebutton
 
 The downloadable video will be stored after processing at /var/bigbluebutton/published/presentation/<presentation_id>/video.mp4 and can be accessed in the browser at https://<your_bbb_server>/presentation/<presentationid>/video.mp4
 
