@@ -24,7 +24,7 @@ async function process(args) {
         await processor.configure()
         await processor.createAssets()
         await processor.createVideo()
-        await processor.cleanup()
+        //await processor.cleanup()
         await processor.verify()
     } catch (error) {
         console.error(error)

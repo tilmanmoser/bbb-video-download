@@ -3,7 +3,8 @@ const { parseStringPromise } = require('xml2js')
 const childProcess = require('child_process')
 
 const parseShapes = async (xml, maxEnd) => {
-    return parseStringPromise(xml)
+
+    return parseStringPromise(xml.split("<br/>").join("\n"))
         .then(obj => {
             checkContainsSVG(obj)
             let slides = parseSlides(obj, maxEnd)
@@ -243,9 +244,12 @@ class MultilineText {
     }
 
     toSVG() {
+        let text = this.content
+        if (text.includes("\n"))
+            text = text.split("\n").join("<br/>")
         return '<switch>' +
             `<foreignObject x="${this.x}" y="${this.y}" width="${this.w}" height="${this.h}">` +
-            `<p xmlns="http://www.w3.org/1999/xhtml" style="margin:0;padding:0;${this.style}">${this.content}</p>` +
+            `<p xmlns="http://www.w3.org/1999/xhtml" style="margin:0;padding:0;${this.style}">${text}</p>` +
             '</foreignObject>' +
             '</switch>'
     }
