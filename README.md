@@ -24,7 +24,10 @@ The installation script will
 
 The downloadable video will be stored after processing at `/var/bigbluebutton/published/presentation/<presentation_id>/video.mp4` and can be accessed in the browser at `https://<your_bbb_server>/presentation/<presentationid>/video.mp4`.
 
-### Manually (re)create presentation videos
+### Create downloadable videos for existing recordings
+Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation or `bbb-record --rebuildall` to reprocess all existing presentations.
+
+Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
 ./node12/bin/node index.js -h
