@@ -1,11 +1,24 @@
 # bbb-video-download
 A BigBlueButton recording postscript to provide video download capability.
 
-Tested with BigBlueButton v2.2.23.
+The assembled video includes:
+* shared audio and webcams video
+* presented slides with
+* * whiteboard actions (text and drawings)
+* * cursor movements
+* * zooming
+* screen sharing
+* captions
+* chapter marks for each slide & screensharing
+
+Differences to bbb presentation:
+* The cursor is rendered as a square box instead of a circle
+* The cursor will grow in size when zoom is applied
 
 ## Install
 **IMPORTANT:** The provided install-script assumes you run BigBlueButton v2.2 on Ubuntu 16.04 as described in the official [documentation](https://docs.bigbluebutton.org/2.2/install.html); i.e. bbb specific folders like the installation directory (/usr/local/bigbluebutton), data directory (/var/bigbluebutton) and log directory (/var/log/bigbluebutton) are hard coded into the scripts.
 
+Tested with BigBlueButton v2.2.23.
 
 ```bash
 cd /opt
