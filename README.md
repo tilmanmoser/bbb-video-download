@@ -22,7 +22,7 @@ The installation script will
 * copy a post_publish script, so that downloadable videos are created automatically
 * change the ownership of the installation directory and post script to bigbluebutton
 
-The downloadable video will be stored after processing at /var/bigbluebutton/published/presentation/<presentation_id>/video.mp4 and can be accessed in the browser at https://<your_bbb_server>/presentation/<presentationid>/video.mp4
+**The downloadable video will be stored after processing at `/var/bigbluebutton/published/presentation/<presentation_id>/video.mp4` and can be accessed in the browser at `https://<your_bbb_server>/presentation/<presentationid>/video.mp4`.**
 
 ### Manually (re)create presentation videos
 ```bash
