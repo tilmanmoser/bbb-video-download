@@ -4,9 +4,9 @@ A BigBlueButton recording postscript to provide video download capability.
 The assembled video includes:
 * shared audio and webcams video
 * presented slides with
-* * whiteboard actions (text and drawings)
-* * cursor movements
-* * zooming
+** whiteboard actions (text and drawings)
+** cursor movements
+** zooming
 * screen sharing
 * captions
 * chapter marks for each slide & screensharing
