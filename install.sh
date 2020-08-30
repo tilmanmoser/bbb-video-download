@@ -18,6 +18,6 @@ rm node-v12.18.3-linux-x64.tar.xz
 ./node12/bin/npm install
 
 # install post_publish script
-BBB_VIDEO_DOWNLOAD_DIR=$(PWD)
+BBB_VIDEO_DOWNLOAD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cp ./snippets/post_publish_bbb_video_download.rb /usr/local/bigbluebutton/core/scripts/post_publish/
 envsubst < /usr/local/bigbluebutton/core/scripts/post_publish/
