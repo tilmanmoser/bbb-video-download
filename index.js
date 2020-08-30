@@ -27,6 +27,7 @@ async function process(args) {
         await processor.cleanup()
         await processor.verify()
     } catch (error) {
+        console.error(error)
         console.log(error)
     }
 }
