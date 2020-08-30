@@ -64,5 +64,8 @@ cd /opt/bbb-video-download
 ### Troubleshooting
 Check /var/log/bigbluebutton/post_publish.log for errors.
 
+### Info for server administrators
+MPEG4 is not a free format. You may need to obtain a license to use this script on your server.
+
 ### Info for fellow developers
 Feel free to reuse my code for further enhancements. The assembled ffmpeg command that renders the video is logged in /var/log/bigbluebutton/post_publish.log.
