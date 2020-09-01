@@ -114,12 +114,12 @@ module.exports.assembleFfmpegCmd = async (options) => {
     inputs.push(options.ffmetadataFile)
     maps.push(`-map_metadata ${inputs.length-1}`)
 
-    let cmd = "ffmpeg \\\n"
+    let cmd = "ffmpeg -y \\\n"
     inputs.forEach(input => { cmd += `-i ${input} \\\n` })
       if (filters.length > 0) 
         cmd += "-filter_complex \"" + filters.join("; \\\n") + "\" \\\n"
     maps.forEach(map => { cmd += map + " \\\n" })
-    cmd += `${options.args.output} -y`
+    cmd += `-strict -2 ${options.args.output}`
     
     return cmd
 }
