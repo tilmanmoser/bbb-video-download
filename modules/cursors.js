@@ -17,8 +17,8 @@ module.exports.parseCursors = async (xml) => {
                 cursors[i].end = cursors[i+1].start
             return cursors
         })
-        .catch(err => {
-            throw new Error(err)
+        .catch(error => {
+            throw error
         })
 }
 

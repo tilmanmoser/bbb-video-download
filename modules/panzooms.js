@@ -17,8 +17,8 @@ module.exports.parsePanzooms = async (xml) => {
                 zooms[i].end = zooms[i+1].start
             return zooms
         })
-        .catch(err => {
-            throw new Error(err)
+        .catch(error => {
+            throw error
         })
 }
 

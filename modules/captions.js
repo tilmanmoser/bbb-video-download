@@ -14,8 +14,8 @@ module.exports.parseCaptions = async (json) => {
             })
         })
         return captions
-    } catch (err) {
-        throw new Error(err)
+    } catch (error) {
+        throw error
     }
 }
 

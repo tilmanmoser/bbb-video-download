@@ -11,8 +11,8 @@ const parseShapes = async (xml, maxEnd) => {
             let whiteboards = parseWhiteboards(obj)
             return attachWhiteboardsToSlides(slides, whiteboards)
         })
-        .catch(err => {
-            throw new Error(err)
+        .catch(error => {
+            throw error
         })
 }
 
@@ -37,10 +37,10 @@ const createCanvas = async (dimensions, duration, workDir) => {
         await new SVG(dimensions.width, dimensions.height)
             .addShape(new Path(`M0 0 L${dimensions.width} 0 L${dimensions.width} ${dimensions.height} L0 ${dimensions.width} Z`, "fill:#F0F0F0"))
             .toPNG(canvasImage)
-        childProcess.execSync(`ffmpeg -hide_banner -loglevel panic -loop 1 -framerate 25 -t ${duration} -i ${canvasImage} -c:v libx264 -vf "format=yuv420p" ${canvasVideo}`)
+        childProcess.execSync(`ffmpeg -hide_banner -loglevel warning -loop 1 -framerate 25 -t ${duration} -i ${canvasImage} -c:v libx264 -vf "format=yuv420p" ${canvasVideo}`)
         return canvasVideo
     } catch (error) {
-        throw new Error(error)
+        throw error
     }
 }
 
@@ -49,8 +49,8 @@ const getDimensionsOfWidestShape = (shapes) => {
     let w=0,h=0
     shapes.forEach(shape => {
         if (shape.width > w) {
-            w = shape.width
-            h = shape.height
+            w = shape.width + (shape.width%2)
+            h = shape.height + (shape.height%2)
         }
     })
     return {width:w,height:h}

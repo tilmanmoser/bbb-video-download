@@ -18,8 +18,8 @@ module.exports.parseDeskshares = async (xml) => {
             }
             return deskshares
         })
-        .catch(err => {
-            throw new Error(err)
+        .catch(error => {
+            throw error
         })
 }
 
