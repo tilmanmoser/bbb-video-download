@@ -75,7 +75,7 @@ const parseSlides = (obj, maxEnd) => {
                 Math.min(1 * image.$.out, maxEnd)
             )
 
-            if (!slide.file.includes('logo.png') && !slide.file.includes('deskshare.png'))
+            if (slide.file && !slide.file.includes('logo.png') && !slide.file.includes('deskshare.png'))
                 slides[slide.id] = slide
         })
     }
@@ -245,7 +245,7 @@ class MultilineText {
 
     toSVG() {
         let text = this.content
-        if (text.includes("\n"))
+        if (text && text.includes("\n"))
             text = text.split("\n").join("<br/>")
         return '<switch>' +
             `<foreignObject x="${this.x}" y="${this.y}" width="${this.w}" height="${this.h}">` +
