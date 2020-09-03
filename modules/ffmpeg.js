@@ -94,9 +94,18 @@ module.exports.assembleFfmpegCmd = async (options) => {
         maps.push(`-map 0 -c:v libx264 -c:a copy`)
     } else {
         if (! await isAllWhite(options.webcamsVideo, options.metadata.duration)) {
-            // webcams video is not entirely white
-            filters.push(`[v${filters.length}]scale=1280:-2,pad=width=1920:height=ih:color=#FFFFFF[v${filters.length + 1}]`)
-            filters.push(`[${inputs.length - 1}]scale=640:-2[overlay${filters.length}];[v${filters.length}][overlay${filters.length}]overlay=x=1280:y=0[v${filters.length + 1}]`)
+            // scale slides, pad and stack webcams
+            let webcamResolution = await getVideoResolution(options.webcamsVideo)
+            let slidesHeight = (options.args.slides_width / options.canvasDimensions.width) * options.canvasDimensions.height
+            let webcamsHeight = (options.args.webcams_width / webcamResolution.width) * webcamResolution.height
+            let videoHeight = Math.round(Math.max(slidesHeight, webcamsHeight))
+            videoHeight = videoHeight + (videoHeight % 2)
+
+            filters.push(`[v${filters.length}]scale=${options.args.slides_width}:-2,pad=width=${options.args.slides_width + options.args.webcams_width}:height=${videoHeight}:color=#FFFFFF[v${filters.length + 1}]`)
+            filters.push(`[${inputs.length - 1}]scale=${options.args.webcams_width}:-2[overlay${filters.length}];[v${filters.length}][overlay${filters.length}]overlay=x=${options.args.slides_width}:y=0[v${filters.length + 1}]`)
+        } else {
+            // only scale slides
+            filters.push(`[v${filters.length}]scale=${options.args.slides_width}:-2[v${filters.length + 1}]`)
         }
         maps.push(`-map [v${filters.length}] -c:v libx264`)
         maps.push(`-map ${inputs.length - 1}:a -c:a copy`)
@@ -134,4 +143,10 @@ const isAllWhite = async (video, duration) => {
         // ignore since childprocess fails when there are no white sequences
     }
     return false
+}
+
+const getVideoResolution = async (video) => {
+    let rs = childProcess.execSync(`ffprobe -v error -show_entries stream=width,height -of csv=p=0:s=x  ${video}`)
+    let dims = rs.toString().split("x")
+    return { width: dims[0], height: dims[1]}
 }

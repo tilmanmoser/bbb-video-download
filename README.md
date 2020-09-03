@@ -46,7 +46,7 @@ Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
 ./node12/bin/node index.js -h
->usage: index.js [-h] [-v] -i INPUT -o OUTPUT
+>usage: index.js [-h] [-v] -i INPUT -o OUTPUT [--slides-width SLIDES_WIDTH] [--webcams-width WEBCAMS_WIDTH]
 >
 >optional arguments:
 >  -h, --help            show this help message and exit
@@ -55,6 +55,10 @@ cd /opt/bbb-video-download
 >                        Path to published presentation
 >  -o OUTPUT, --output OUTPUT
 >                        Outputfile .mp4
+>  --slides-width SLIDES_WIDTH
+>                        Set width (int) of slide area (presentation and/or deskshare); default 1280
+>  --webcams-width WEBCAMS_WIDTH
+>                        Set width (int) of webcams area; default 640
 ```
 
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:

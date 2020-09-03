@@ -1,4 +1,6 @@
 const langs = require('langs')
+const fs = require('fs')
+const childProcess = require('child_process')
 
 module.exports.parseCaptions = async (json) => {
     try {

@@ -25,12 +25,19 @@ class Processor {
             this.deskshares = await parseDeskshares(fs.readFileSync(this.inputDir + '/deskshare.xml').toString())
             this.panzooms = await parsePanzooms(fs.readFileSync(this.inputDir + '/panzooms.xml').toString())
             this.captions = await parseCaptions(fs.readFileSync(this.inputDir + '/captions.json').toString())
-            if (fs.existsSync(this.inputDir + '/deskshare/'))
-                this.deskshareVideo = this.inputDir + '/deskshare/' + fs.readdirSync(this.inputDir + '/deskshare/').values().next().value
-            if (fs.existsSync(this.inputDir + '/video/'))
-                this.webcamsVideo = this.inputDir + '/video/' + fs.readdirSync(this.inputDir + '/video/').values().next().value
+            
+            if (fs.existsSync(this.inputDir + '/deskshare/deskshare.mp4'))
+                this.deskshareVideo = this.inputDir + '/deskshare/deskshare.mp4'
+            else if (fs.existsSync(this.inputDir + '/deskshare/deskshare.webm'))
+                this.deskshareVideo = this.inputDir + '/deskshare/deskshare.webm'
+
+            if (fs.existsSync(this.inputDir + '/video/webcams.mp4'))
+                this.webcamsVideo = this.inputDir + '/video/webcams.mp4'
+            else if (fs.existsSync(this.inputDir + '/video/webcams.webm'))
+                this.webcamsVideo = this.inputDir + '/video/webcams.webm'
+
         } catch (error) {
-            throw new Error(error)
+            throw error
         }
     }
 
@@ -47,7 +54,7 @@ class Processor {
             this.ffmetadataFile = this.workdir + '/ffmetadata.txt'
             await createFfMetadataFile(this.ffmetadataFile, this.metadata, this.shapes, this.deskshares)
         } catch (error) {
-            throw new Error(error)
+            throw error
         }
     }
 
@@ -57,7 +64,7 @@ class Processor {
             console.log(cmd)
             childProcess.execSync(cmd)
         } catch (error) {
-            throw new Error(error)
+            throw error
         }
 
     }
@@ -66,7 +73,7 @@ class Processor {
         try {
             deleteDir(this.workdir)
         } catch (erorr) {
-            throw new Error(error)
+            throw error
         }
         
     }
@@ -78,7 +85,7 @@ class Processor {
             else    
                 console.log('Failed to create video')
         } catch (erorr) {
-            throw new Error(error)
+            throw error
         }
     }
 
