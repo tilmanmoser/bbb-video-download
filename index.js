@@ -30,6 +30,21 @@ argsParser.add_argument('--webcams-width', {
     default: 640
 })
 
+argsParser.add_argument('--threads', {
+    help: 'Set # of threads (int) to be used by ffmpeg; default 1',
+    required: false,
+    type: 'int',
+    default: 1
+})
+
+argsParser.add_argument('--filter-threads', {
+    help: 'Set # of filter threads (int) to be used by ffmpeg; default 1',
+    required: false,
+    type: 'int',
+    default: 1
+})
+
+
 const args = argsParser.parse_args()
 
 async function process(args) {

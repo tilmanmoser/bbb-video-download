@@ -124,6 +124,7 @@ module.exports.assembleFfmpegCmd = async (options) => {
     maps.push(`-map_metadata ${inputs.length-1}`)
 
     let cmd = "ffmpeg -y \\\n"
+    cmd += `-threads ${options.args.threads} -filter_threads ${options.args.filter_threads} \\\n`
     inputs.forEach(input => { cmd += `-i ${input} \\\n` })
       if (filters.length > 0) 
         cmd += "-filter_complex \"" + filters.join("; \\\n") + "\" \\\n"

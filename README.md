@@ -59,6 +59,10 @@ cd /opt/bbb-video-download
 >                        Set width (int) of slide area (presentation and/or deskshare); default 1280
 >  --webcams-width WEBCAMS_WIDTH
 >                        Set width (int) of webcams area; default 640
+>  --threads THREADS     
+>                        Set # of threads (int) to be used by ffmpeg; default 1
+>  --filter-threads FILTER_THREADS
+>                        Set # of filter threads (int) to be used by ffmpeg; default 1
 ```
 
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:
