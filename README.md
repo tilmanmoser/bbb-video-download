@@ -46,7 +46,7 @@ Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
 ./node12/bin/node index.js -h
->usage: index.js [-h] [-v] -i INPUT -o OUTPUT [--slides-width SLIDES_WIDTH] [--webcams-width WEBCAMS_WIDTH]
+>usage: index.js [-h] [-v] -i INPUT -o OUTPUT [--slides-width SLIDES_WIDTH] [--webcams-width WEBCAMS_WIDTH] [--threads THREADS] [--filter-threads FILTER_THREADS]
 >
 >optional arguments:
 >  -h, --help            show this help message and exit
