@@ -1,7 +1,7 @@
 const fs = require('fs')
 const http = require('http')
 const getPort = require('get-port')
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-core')
 const childProcess = require('child_process')
 const { parseStringPromise } = require('xml2js')
 const { parseNumbers } = require('xml2js/lib/processors')
