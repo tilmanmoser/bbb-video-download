@@ -126,8 +126,12 @@ module.exports.assembleFfmpegCmd = async (options) => {
     let cmd = "ffmpeg -y \\\n"
     cmd += `-threads ${options.args.threads} -filter_threads ${options.args.filter_threads} \\\n`
     inputs.forEach(input => { cmd += `-i ${input} \\\n` })
-      if (filters.length > 0) 
-        cmd += "-filter_complex \"" + filters.join("; \\\n") + "\" \\\n"
+    if (filters.length > 0) {
+       filtercomplexFile = options.workdir + '/fffiltercomplex.txt'
+       filtercomplex = filters.join(";")
+       fs.writeFileSync(filtercomplexFile, filtercomplex)
+       cmd += "-filter_complex_script " + filtercomplexFile +  " \\\n"
+    }
     maps.forEach(map => { cmd += map + " \\\n" })
     cmd += `-strict -2 ${options.args.output}`
     
