@@ -24,6 +24,8 @@ chmod u+x install.sh
 sudo ./install.sh
 ```
 
+
+**IMPORTANT:** Don't update node via apt, since BBB relies on node v8! 
 The installation script will
 * install dependencies for images processing via apt
 * download node v12 binaries for linux x64 (as BBB only provides node v12).
@@ -31,7 +33,6 @@ The installation script will
 * copy a post_publish script, so that downloadable videos are created automatically
 * change the ownership of the installation directory and post script to bigbluebutton
 
-**IMPORTANT:** Don't update node via apt, since BBB relies on node v8!
 
 The downloadable video will be stored after processing at `/var/bigbluebutton/published/presentation/<presentation_id>/video.mp4` and can be accessed in the browser at `https://<your_bbb_server>/presentation/<presentationid>/video.mp4`.
 

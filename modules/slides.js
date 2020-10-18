@@ -173,7 +173,10 @@ const createServer = async (basedir, port) => {
 }
 
 const captureFrames = async (serverUrl, presentation, workdir) => {
-    const browser = await puppeteer.launch({ /*headless: false */})
+    const browser = await puppeteer.launch({
+         /*headless: false, */
+         executablePath: '/usr/bin/firefox'
+        })
     const page = await browser.newPage()
     await page.setViewport({
         width: presentation.viewport.width,
