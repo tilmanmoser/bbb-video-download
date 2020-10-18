@@ -1,23 +1,16 @@
 {
   "name": "bbb-video-download",
-  "version": "1.0.6",
+  "version": "1.1.0",
+  "description": "A BigBlueButton recording postscript to provide video download capability.",
   "main": "index.js",
+  "author": "Tilman Moser",
   "license": "MIT",
-  "devDependencies": {
-    "image-size": "^0.8.3",
-    "jest": "^26.4.2",
-    "jest-image-snapshot": "^4.1.0"
-  },
-  "scripts": {
-    "process": "node index.js",
-    "test": "jest tests/ --coverage --verbose --force-exit"
-  },
   "dependencies": {
-    "argparse": "^2.0.0",
-    "del": "^5.1.0",
+    "argparse": "^2.0.1",
+    "dotenv": "^8.2.0",
+    "get-port": "^5.1.1",
     "langs": "^2.0.0",
-    "mkdirp": "^1.0.4",
-    "svg-to-img": "^2.0.9",
+    "puppeteer": "^5.3.1",
     "xml2js": "^0.4.23"
   }
 }

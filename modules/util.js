@@ -1,18 +1,14 @@
-const del = require('del')
-const mkdirp = require('mkdirp')
+const childProcess = require('child_process')
 
-module.exports.toArray = (obj) => {
-    if (Array.isArray(obj)) return obj
-    return [obj]
-}
-module.exports.reCreateDir = async (dir) => {
-    await del(dir)
-    await mkdirp(dir)
-}
-module.exports.deleteDir = async (dir) => {
-    await del(dir)
+module.exports.getVideoInfo = async (video) => {
+    const videoInfo = JSON.parse(
+        childProcess.execSync('ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of json ' + video)
+    )
+    return {
+        video: video,
+        duration: videoInfo.streams[0].duration * 1.0,
+        width: videoInfo.streams[0].width * 1,
+        height: videoInfo.streams[0].height * 1
+    }
 }
 
-module.exports.removeTrailingSlash = (dir) => {
-    return (dir.substring(-1) === '/') ? dir.substring(0, dir.length - 1) : dir
-}

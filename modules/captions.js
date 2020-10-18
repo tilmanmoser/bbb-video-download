@@ -1,38 +1,27 @@
-const langs = require('langs')
 const fs = require('fs')
+const langs = require('langs')
 const childProcess = require('child_process')
 
-module.exports.parseCaptions = async (json) => {
-    try {
-        let captions = []
-        let array = JSON.parse(json)
-        array.forEach(element => {
-            captions.push({
-                language: element.localeName,
-                code1: element.locale,
-                code2: langs.where(1, element.locale)['2']
-            })
-        })
-        return captions
-    } catch (error) {
-        throw error
+module.exports.createCaptions = async (config) => {
+    if (fs.existsSync(config.args.input + '/captions.json')) {
+        const captions = JSON.parse(fs.readFileSync(config.args.input + '/captions.json').toString())
+        if (Array.isArray(captions) && captions.length > 0) {
+            for (let i=0; i<captions.length; i++) {
+                await transformCaptions(captions[i], config)
+            }
+            return captions
+        }
     }
+    return null
 }
 
-module.exports.createCaptions = async (captions, inputDir, workDir) => {
-    let captionFiles = []
-    if (Array.isArray(captions))
-        captions.forEach(caption => {
-            let captionVTT = inputDir + '/caption_' + caption.code1 + '.vtt'
-            let captionSRT = workDir + '/caption_' + caption.code2 + '.srt'
-            if (fs.existsSync(captionVTT)) {
-                try {
-                    childProcess.execSync(`ffmpeg -i ${captionVTT} ${captionSRT}`)
-                    captionFiles.push({ file: captionSRT, lang: caption.code2 })
-                } catch (error) {
-                    throw new Error(error.message)
-                }
-            }
-        })
-    return captionFiles
+const transformCaptions = async (caption, config) => {
+    const captionCode = langs.where(1, caption.locale)['2']
+    const captionInFile = config.args.input + '/caption_' + caption.locale + '.vtt'
+    const captionOutFile = config.workdir + '/caption_' + captionCode + '.srt'
+
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel warning -i ${captionInFile} ${captionOutFile}`)
+
+    caption.code = captionCode
+    caption.file = captionOutFile
 }

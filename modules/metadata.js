@@ -1,19 +1,18 @@
+const fs = require('fs')
 const { parseStringPromise } = require('xml2js')
+const { parseNumbers } = require('xml2js/lib/processors')
 
-module.exports.parseMetadata = async (xml) => {
-    return parseStringPromise(xml, { explicitArray: false })
-        .then(obj => {
-            let metadata = {}
-            if (obj.recording) {
-                metadata.id = obj.recording.id
-                metadata.start = new Date(1*obj.recording.start_time)
-                metadata.end = new Date(1*obj.recording.end_time)
-                metadata.duration = 1* obj.recording.playback.duration / 1000
-                metadata.name = obj.recording.meeting.$.name
+module.exports.parseMetadata = async (config) => {
+    if (fs.existsSync(config.args.input + '/metadata.xml')) {
+        return parseStringPromise(fs.readFileSync(config.args.input + '/metadata.xml').toString(), {
+            attrValueProcessors: [parseNumbers],
+            explicitArray: false
+        }).then(data => {
+            return {
+                duration: data.recording.playback.duration / 1000
             }
-            return metadata
         })
-        .catch(error => {
-            throw error
-        })
+    } else {
+        throw new Error('metadata.xml not found in input directory')
+    }
 }

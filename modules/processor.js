@@ -1,94 +1,91 @@
 const fs = require('fs')
-const del = require('del')
-const mkdirp = require('mkdirp')
+const util = require('util')
+const { createPresentationVideo } = require('./presentation')
+const { getWebcamsVideo } = require('./webcams')
 const childProcess = require('child_process')
-const { parseShapes, SVG, getDimensionsOfWidestShape, Path, createShapes, createCanvas } = require('./shapes')
-const { parseCursors } = require('./cursors')
-const { parseDeskshares } = require('./deskshares')
-const { parsePanzooms } = require('./panzooms')
+const { getVideoInfo } = require('./util')
+const { createCaptions } = require('./captions')
 const { parseMetadata } = require('./metadata')
-const { parseCaptions, createCaptions } = require('./captions')
-const { createFfMetadataFile, assembleFfmpegCmd } = require('./ffmpeg')
-const { reCreateDir: createWorkdir, deleteDir, removeTrailingSlash } = require('./util')
 
-class Processor {
-    constructor(args) {
-        this.args = args
-        this.inputDir = removeTrailingSlash(args.input)
-    }
+module.exports.createVideo = async (config) => {
+    // create workdir
+    fs.mkdirSync('./tmp', { recursive: true })
+    config.workdir = fs.mkdtempSync('./tmp/data')
+    
+    // metadata
+    const metadata = await parseMetadata(config)
 
-    async configure() {
-        try {
-            this.metadata = await parseMetadata(fs.readFileSync(this.inputDir + '/metadata.xml').toString())
-            this.shapes = await parseShapes(fs.readFileSync(this.inputDir + '/shapes.svg').toString(), this.metadata.duration)
-            this.cursors = await parseCursors(fs.readFileSync(this.inputDir + '/cursor.xml').toString())
-            this.deskshares = await parseDeskshares(fs.readFileSync(this.inputDir + '/deskshare.xml').toString())
-            this.panzooms = await parsePanzooms(fs.readFileSync(this.inputDir + '/panzooms.xml').toString())
-            this.captions = await parseCaptions(fs.readFileSync(this.inputDir + '/captions.json').toString())
-            
-            if (fs.existsSync(this.inputDir + '/deskshare/deskshare.mp4'))
-                this.deskshareVideo = this.inputDir + '/deskshare/deskshare.mp4'
-            else if (fs.existsSync(this.inputDir + '/deskshare/deskshare.webm'))
-                this.deskshareVideo = this.inputDir + '/deskshare/deskshare.webm'
+    // video & audio
+    const webcams = await getWebcamsVideo(config, metadata.duration)
+    const presentation = await createPresentationVideo(config, metadata.duration)
+    const fullVideo = await combinePresentationWithWebcams(presentation, webcams, config)
 
-            if (fs.existsSync(this.inputDir + '/video/webcams.mp4'))
-                this.webcamsVideo = this.inputDir + '/video/webcams.mp4'
-            else if (fs.existsSync(this.inputDir + '/video/webcams.webm'))
-                this.webcamsVideo = this.inputDir + '/video/webcams.webm'
+    // captions
+    const captions = await createCaptions(config)
+    if (captions)
+        await addCaptions(captions, fullVideo)
 
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async createAssets() {
-        try {
-            this.workdir = './tmp/' + this.metadata.id
-            await createWorkdir(this.workdir)
-            this.shapeFiles = await createShapes(this.shapes, this.workdir),
-            this.captionFiles = await createCaptions(this.captions, this.inputDir, this.workdir)
-            if (this.shapes.length > 0) {
-                this.canvasDimensions = getDimensionsOfWidestShape(this.shapes)
-                this.canvasFile = await createCanvas(this.canvasDimensions, this.metadata.duration, this.workdir)
-            }
-            this.ffmetadataFile = this.workdir + '/ffmetadata.txt'
-            await createFfMetadataFile(this.ffmetadataFile, this.metadata, this.shapes, this.deskshares)
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async createVideo() {
-        try {
-            let cmd = await assembleFfmpegCmd(this)
-            console.log(cmd)
-            childProcess.execSync(cmd)
-        } catch (error) {
-            throw error
-        }
-
-    }
-
-    async cleanup() {
-        try {
-            deleteDir(this.workdir)
-        } catch (erorr) {
-            throw error
-        }
-        
-    }
- 
-    async verify() {
-        try {
-            if (fs.existsSync(this.args.output))
-                console.log(`Success. Created ${this.args.output}`)
-            else    
-                console.log('Failed to create video')
-        } catch (erorr) {
-            throw error
-        }
-    }
-
+    // copy video to destination
+    await renderFinalVideo(fullVideo.video, config.args.output)
+    
+    // cleanup workdir
+    fs.rmdirSync(config.workdir, { recursive: true })
 }
 
-module.exports.Processor = Processor
+const combinePresentationWithWebcams = async (presentation, webcams, config) => {
+    const video = config.workdir + '/video.mp4'
+
+    if (!presentation && !webcams)
+        throw new Error('The presentation does not contain any renderable inputs (slides, deskshares or webcams/audio)')
+    
+    if (presentation && !webcams)
+        fs.renameSync(presentation.video, video)
+    
+    if (!presentation && webcams)
+        await copyWebcamsVideo(webcams.video, video)
+    
+    if (presentation && webcams.isOnlyAudio)
+        await copyWebcamsAudioToPresentation(presentation, webcams, video)
+    else
+        await stackWebcamsToPresentation(presentation, webcams, video)
+
+    return getVideoInfo(video)
+}
+
+const copyWebcamsVideo = async (input, output) => {
+    childProcess.exec(`ffmpeg -hide_banner -loglevel error -i ${input} -y ${ouput}`)
+}
+
+const copyWebcamsAudioToPresentation = async (presentation, webcams, output) => {
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -i ${presentation.video} -i ${webcams.video} -c:v copy -c:a aac -map 0:0 -map 1:1 -shortest -y ${output}`)
+}
+
+const stackWebcamsToPresentation = async (presentation, webcams, output) => {
+        const width = presentation.width + webcams.width
+        let height = Math.max(presentation.height, webcams.height)
+        if (height % 2) height += 1
+        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -i ${presentation.video} -i ${webcams.video} -filter_complex "[0:v]pad=width=${width}:height=${height}:color=white[p];[p][1:v]overlay=x=${presentation.width}:y=0[out]" -map [out] -map 1:1 -c:a aac -shortest -y ${output}`)
+}
+
+const addCaptions = async (captions, videoObject) => {
+    const tmpFile = videoObject.video + '.tmp.mp4'
+
+    let cmd = 'ffmpeg -hide_banner -loglevel error -i ' + videoObject.video
+    captions.forEach(caption => { cmd += ' -i ' + caption.file})
+    cmd += ' -map 0'
+    captions.forEach((caption,idx) => { cmd += ` -map ${idx+1}:s`})
+    cmd += ' -c copy'
+    captions.forEach(caption => cmd += ' -c:s mov_text')
+    captions.forEach((caption, idx) => { cmd += ` -metadata:s:s:${idx} language=${caption.code}`})
+    cmd += ' -y ' + tmpFile    
+    
+    childProcess.execSync(cmd)
+
+    if (fs.existsSync(videoObject.video))
+        fs.unlinkSync(videoObject.video)
+    fs.renameSync(tmpFile, videoObject.video)
+}
+
+const renderFinalVideo = async (input, output) => {
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -i ${input} -y ${output}`)
+}

@@ -9,11 +9,7 @@ The assembled video includes:
     * zooming
 * screen sharing
 * captions
-* chapter marks for each slide & screensharing
 
-Differences to bbb presentation:
-* The cursor is rendered as a square box instead of a circle
-* The cursor will grow in size when zoom is applied
 
 ## Install
 **IMPORTANT:** The provided install-script assumes you run BigBlueButton v2.2 on Ubuntu 16.04 as described in the official [documentation](https://docs.bigbluebutton.org/2.2/install.html); i.e. bbb specific folders like the installation directory (/usr/local/bigbluebutton), data directory (/var/bigbluebutton) and log directory (/var/log/bigbluebutton) are hard coded into the scripts.
@@ -43,6 +39,23 @@ The downloadable video will be stored after processing at `/var/bigbluebutton/pu
 ```bash
 cd /opt/bbb-video-download
 git pull origin master
+rm -r node_modules
+./node12/bin/npm install
+```
+
+When updating from 1.0.x to 1.1.x consider renaming `/usr/local/bigbluebutton/core/scripts/post_publish/post_publish_bbb_video_download.rb` to `/usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb` in order to be the first script called in post publish phase.
+
+## Uninstall
+up to version 1.0.x:
+```bash
+rm /usr/local/bigbluebutton/core/scripts/post_publish/post_publish_bbb_video_download.rb
+rm -r /opt/bbb-video-download
+```
+
+from version 1.1.x on:
+```bash
+rm /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
+rm -r /opt/bbb-video-download
 ```
 
 ### Create downloadable videos for existing recordings
@@ -52,23 +65,17 @@ Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
 ./node12/bin/node index.js -h
->usage: index.js [-h] [-v] -i INPUT -o OUTPUT [--slides-width SLIDES_WIDTH] [--webcams-width WEBCAMS_WIDTH] [--threads THREADS] [--filter-threads FILTER_THREADS]
+>usage: index.js [-h] [-v] -i INPUT -o OUTPUT
+>
+>A BigBlueButton recording postscript to provide video download capability.
 >
 >optional arguments:
 >  -h, --help            show this help message and exit
 >  -v, --version         show program's version number and exit
 >  -i INPUT, --input INPUT
->                        Path to published presentation
+>                        path to BigBlueButton published presentation
 >  -o OUTPUT, --output OUTPUT
->                        Outputfile .mp4
->  --slides-width SLIDES_WIDTH
->                        Set width (int) of slide area (presentation and/or deskshare); default 1280
->  --webcams-width WEBCAMS_WIDTH
->                        Set width (int) of webcams area; default 640
->  --threads THREADS     
->                        Set # of threads (int) to be used by ffmpeg; default 1
->  --filter-threads FILTER_THREADS
->                        Set # of filter threads (int) to be used by ffmpeg; default 1
+>                        path to outfile
 ```
 
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:
@@ -83,5 +90,11 @@ Check /var/log/bigbluebutton/post_publish.log for errors.
 ### Info for server administrators
 MPEG4 is not a free format. You may need to obtain a license to use this script on your server.
 
-### Info for fellow developers
-Feel free to reuse my code for further enhancements. The assembled ffmpeg command that renders the video is logged in /var/log/bigbluebutton/post_publish.log.
+### Version history:
+- 1.0.0 initial release
+- 1.0.1 - 1.0.6 minor bug fixes
+- 1.1.0 major rewrite:
+- - script is able to render videos with many(!) whiteboard drawings
+- - improved overall quality of images & drawings in presentations
+- - cursor rendered as in bbb playback
+- - removed chapter marks
