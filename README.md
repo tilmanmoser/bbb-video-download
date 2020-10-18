@@ -26,6 +26,7 @@ sudo ./install.sh
 
 
 **IMPORTANT:** Don't update node via apt, since BBB relies on node v8! 
+
 The installation script will
 * install dependencies for images processing via apt
 * download node v12 binaries for linux x64 (as BBB only provides node v12).
@@ -43,8 +44,6 @@ git pull origin master
 rm -r node_modules
 ./node12/bin/npm install
 ```
-
-When updating from 1.0.x to 1.1.x consider renaming `/usr/local/bigbluebutton/core/scripts/post_publish/post_publish_bbb_video_download.rb` to `/usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb` in order to be the first script called in post publish phase.
 
 ## Uninstall
 up to version 1.0.x:
