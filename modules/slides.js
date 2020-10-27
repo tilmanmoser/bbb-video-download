@@ -94,25 +94,23 @@ const parseImages = (data, frames, duration) => {
 }
 
 const parseDrawings = (data, frames, duration) => {
-    const shapes = {}
+    const drawings = {}
     if (data.svg.g) {
         data.svg.g.forEach(canvas => {
             if (canvas.g) {
                 canvas.g.forEach(element => {
                     if (element.$.timestamp < duration)
-                        if (!shapes[element.$.shape] || shapes[element.$.shape].timestamp < element.$.timestamp)
-                            shapes[element.$.shape] = {
-                                id: element.$.id,
-                                timestamp: element.$.timestamp
-                            }
+                        drawings[element.$.id] = {
+                            timestamp: element.$.timestamp
+                        }
                 })
             }
         })
     }
-    Object.keys(shapes).forEach(shapeId => {
-        getFrameByTimestamp(frames, shapes[shapeId].timestamp).actions.push({
+    Object.keys(drawings).forEach(id => {
+        getFrameByTimestamp(frames, drawings[id].timestamp).actions.push({
             action: actions.showDrawing,
-            id: shapes[shapeId].id
+            id: id
         })
     })
 }
@@ -237,7 +235,7 @@ const captureFrames = async (serverUrl, presentation, workdir) => {
 const showImage = async (page, id) => {
     await page.evaluate((id) => {
         document.querySelector('#' + id).style.visibility = 'visible'
-        const canvas = document.querySelector('#canvas' + id.match(/\d/))
+        const canvas = document.querySelector('#canvas' + id.match(/\d+/))
         if (canvas) canvas.setAttribute('display', 'block')
     }, id)
 }
@@ -245,14 +243,18 @@ const showImage = async (page, id) => {
 const hideImage = async (page, id) => {
     await page.evaluate((id) => {
         document.querySelector('#' + id).style.visibility = 'hidden'
-        const canvas = document.querySelector('#canvas' + id.match(/\d/))
+        const canvas = document.querySelector('#canvas' + id.match(/\d+/))
         if (canvas) canvas.setAttribute('display', 'none')
     }, id)
 }
 
 const showDrawing = async (page, id) => {
     await page.evaluate((id) => {
-        document.querySelector('#' + id).style.visibility = 'visible'
+        const drawing = document.querySelector('#' + id)
+        document.querySelectorAll('[shape=' + drawing.getAttribute('shape') + ']').forEach( element => {
+            element.style.visibility = 'hidden'
+        })
+        drawing.style.visibility = 'visible'
     }, id)
 }
 
