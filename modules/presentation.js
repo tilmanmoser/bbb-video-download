@@ -49,7 +49,7 @@ const combinedSlidesAndDeskshares = async (slides, deskshares, config) => {
     })
     fs.writeFileSync(filtersScriptFile, filters.join(";\n"))
 
-    const cmd = `ffmpeg -hide_banner -loglevel error -i ${slides.video} -i ${deskshares.video} -filter_complex_script ${filtersScriptFile} -map '[v${filters.length}]' -threads 1 ${tmpFile}`
+    const cmd = `ffmpeg -hide_banner -loglevel error -i ${slides.video} -i ${deskshares.video} -filter_complex_script ${filtersScriptFile} -map '[v${filters.length}]' -threads 1 -strict -2 ${tmpFile}`
     childProcess.execSync(cmd)
     if (fs.existsSync(outFile))
         fs.unlinkSync(outFile)
