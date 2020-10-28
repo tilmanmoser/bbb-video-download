@@ -31,23 +31,29 @@ const onlyDeskshares = async (deskshares) => {
 }
 
 const combinedSlidesAndDeskshares = async (slides, deskshares, config) => {
+    const filtersScriptFile = config.workdir + '/filters.txt'
     const tmpFile = config.workdir + '/presentation.tmp.mp4'
     const outFile = config.workdir + '/presentation.mp4'
 
-    for (let chunk=0; chunk<deskshares.parts.length; chunk+=config.env.chunksize) {
-        const parts = deskshares.parts.slice(chunk, chunk+config.env.chunksize)
-        const filters = ['[1:v][0:v]scale2ref[d][v1]']
+    const scaling = (deskshares.width > deskshares.height)
+        ? '-2:' + slides.viewport.height
+        : slides.viewport.width + ':-2'
 
-        parts.forEach(part => {
-            filters.push(`[v${filters.length}][d]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
-        })
+    let dparts = ''
+    deskshares.parts.forEach((part,index) => {dparts += '[d' + index + ']'});
 
-        const cmd = `ffmpeg -hide_banner -loglevel error -i ${slides.video} -i ${deskshares.video} -filter_complex "${filters.join(';')}" -map '[v${filters.length}]' -threads 1 ${tmpFile}`
-        childProcess.execSync(cmd)
-        if (fs.existsSync(outFile))
-                fs.unlinkSync(outFile)
-            fs.renameSync(tmpFile, outFile)
-    } 
+    const filters = [`[1]scale=${scaling},split${dparts}`]
+    deskshares.parts.forEach((part,index) => {
+        const inStream = (index > 0) ? '[v' + filters.length + ']' : '[0]'
+        filters.push(`${inStream}[d${index}]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
+    })
+    fs.writeFileSync(filtersScriptFile, filters.join(";\n"))
+
+    const cmd = `ffmpeg -hide_banner -loglevel error -i ${slides.video} -i ${deskshares.video} -filter_complex_script ${filtersScriptFile} -map '[v${filters.length}]' -threads 1 ${tmpFile}`
+    childProcess.execSync(cmd)
+    if (fs.existsSync(outFile))
+        fs.unlinkSync(outFile)
+    fs.renameSync(tmpFile, outFile)
 
     return await getVideoInfo(outFile)
 }
