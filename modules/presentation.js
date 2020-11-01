@@ -35,18 +35,19 @@ const combinedSlidesAndDeskshares = async (slides, deskshares, config) => {
     const tmpFile = config.workdir + '/presentation.tmp.mp4'
     const outFile = config.workdir + '/presentation.mp4'
 
-    const scaling = (deskshares.width > deskshares.height)
-        ? '-2:' + slides.viewport.height
-        : slides.viewport.width + ':-2'
+    // let dparts = ''
+    // deskshares.parts.forEach((part,index) => {dparts += '[d' + index + ']'});
 
-    let dparts = ''
-    deskshares.parts.forEach((part,index) => {dparts += '[d' + index + ']'});
-
-    const filters = [`[1]scale=${scaling},split${dparts}`]
+    // const filters = [`[1][0]scale2ref=ow*mdar:ih[d][v1];[d]split${dparts}`]
+    // deskshares.parts.forEach((part,index) => {
+    //     filters.push(`[v${filters.length}][d${index}]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
+    // })
+    const filters = []
     deskshares.parts.forEach((part,index) => {
-        const inStream = (index > 0) ? '[v' + filters.length + ']' : '[0]'
-        filters.push(`${inStream}[d${index}]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
+        const inStream = (index == 0) ? '[0]' : '[v' + filters.length + ']'
+        filters.push(`[1]trim=${part.start}:${part.end}[d${index}];[d${index}]${inStream}scale2ref=oh*mdar:ih[do${index}][s${index}];[s${index}][do${index}]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
     })
+
     fs.writeFileSync(filtersScriptFile, filters.join(";\n"))
 
     const cmd = `ffmpeg -hide_banner -loglevel error -i ${slides.video} -i ${deskshares.video} -filter_complex_script ${filtersScriptFile} -map '[v${filters.length}]' -threads 1 -strict -2 ${tmpFile}`

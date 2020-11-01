@@ -15,10 +15,7 @@ const arguments = parser.parse_args()
 validateArguments(arguments)
 
 module.exports.config = {
-  args: arguments,
-  env: {
-    chunksize: process.env.CHUNKSIZE || 25
-  }
+  args: arguments
 }
 
 function validateArguments (arguments) {
