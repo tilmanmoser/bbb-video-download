@@ -63,7 +63,7 @@ const copyWebcamsVideo = async (input, output) => {
 }
 
 const copyWebcamsAudioToPresentation = async (presentation, webcams, output) => {
-    childProcess.execSync(`ffmpeg -hide_banner -loglevel -threads 1 error -i ${presentation.video} -i ${webcams.video} -c:v copy -c:a aac -map 0:0 -map 1:1 -shortest -y ${output}`)
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${presentation.video} -i ${webcams.video} -c:v copy -c:a aac -map 0:0 -map 1:1 -shortest -y ${output}`)
 }
 
 const stackWebcamsToPresentation = async (presentation, webcams, output) => {

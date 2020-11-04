@@ -42,11 +42,10 @@ meeting_metadata = BigBlueButton::Events.get_meeting_metadata("/var/bigbluebutto
 require 'shellwords'
 input_dir = Shellwords.escape(published_files)
 output_file = Shellwords.escape("#{published_files}/video.mp4")
-node_file = Shellwords.escape("/opt/bbb-video-download/index.js")
 base_dir = '${BBB_VIDEO_DOWNLOAD_DIR}'
 
 BigBlueButton.logger.info("Create downloadable video for [#{meeting_id}] start")
-rs = `cd #{base_dir} && ./node12/bin/node #{node_file} -i #{input_dir} -o #{output_file}`
+rs = `cd #{base_dir} && docker-compose run --rm app node index.js -i #{input_dir} -o #{output_file}`
 BigBlueButton.logger.info(rs)
 BigBlueButton.logger.info("Create downloadable video for [#{meeting_id}] end")
 

@@ -12,37 +12,37 @@ The assembled video includes:
 
 
 ## Install
-**IMPORTANT:** The provided install-script assumes you run BigBlueButton v2.2 on Ubuntu 16.04 as described in the official [documentation](https://docs.bigbluebutton.org/2.2/install.html); i.e. bbb specific folders like the installation directory (/usr/local/bigbluebutton), data directory (/var/bigbluebutton) and log directory (/var/log/bigbluebutton) are hard coded into the scripts.
 
-Tested with BigBlueButton v2.2.23.
+**Dependencies**
+Since version 1.2 the script was dockerized, i.e. it needs docker and docker-compose installed on the host. 
 
+```bash
+sudo apt update
+sudo apt install docker docker-compose
+```
+
+**Installation**
 ```bash
 cd /opt
 git clone https://github.com/tilmanmoser/bbb-video-download.git
-cd bbb-video-download
-chmod u+x install.sh
-sudo ./install.sh
+docker-compose build app
+```
+
+**If** you want to run the script for every new recording automatically, install the post_publish hook like this:
+```bash
+cd /opt/bbb-video-download
+export BBB_VIDEO_DOWNLOAD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+envsubst < ./snippets/post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
 ```
 
 
-**IMPORTANT:** Don't update node via apt, since BBB relies on node v8! 
-
-The installation script will
-* install dependencies for images processing via apt
-* download node v12 binaries for linux x64 (as BBB only provides node v12).
-* install node_modules for bbb_video_download
-* copy a post_publish script, so that downloadable videos are created automatically
-* change the ownership of the installation directory and post script to bigbluebutton
-
-
-The downloadable video will be stored after processing at `/var/bigbluebutton/published/presentation/<presentation_id>/video.mp4` and can be accessed in the browser at `https://<your_bbb_server>/presentation/<presentationid>/video.mp4`.
-
 ## Update
+If you're updating from an older version to 1.2, please uninstall and reinstall.
+
 ```bash
 cd /opt/bbb-video-download
 git pull origin master
-rm -r node_modules
-./node12/bin/npm install
+docker-compose build app
 ```
 
 ## Uninstall
@@ -52,11 +52,20 @@ rm /usr/local/bigbluebutton/core/scripts/post_publish/post_publish_bbb_video_dow
 rm -r /opt/bbb-video-download
 ```
 
-from version 1.1.x on:
+up to version 1.1.x
 ```bash
 rm /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
 rm -r /opt/bbb-video-download
 ```
+
+from version 1.2.x on
+```bash
+rm /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
+rm -r /opt/bbb-video-download
+sudo docker rmi --force $(docker images -q 'bbb-video-download_app' | uniq)
+sudo docker rmi --force $(docker images -q 'node' | uniq)
+```
+
 
 ### Create downloadable videos for existing recordings
 Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation or `bbb-record --rebuildall` to reprocess all existing presentations.
@@ -64,7 +73,7 @@ Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation 
 Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
-./node12/bin/node index.js -h
+docker-compose run --rm app node index.js -h
 >usage: index.js [-h] [-v] -i INPUT -o OUTPUT
 >
 >A BigBlueButton recording postscript to provide video download capability.
@@ -81,11 +90,11 @@ cd /opt/bbb-video-download
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:
 ```bash
 cd /opt/bbb-video-download
-./node12/bin/node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o your-video.mp4
+docker-compose run --rm app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
 ```
 
-### Troubleshooting
-Check /var/log/bigbluebutton/post_publish.log for errors.
+*Please note, that all directories you want to access as input or output must be mounted as volumes in docker-compose.yml. Out of the box only /var/bigbluebutton/published/presentation is mounted.*
+
 
 ### Info for server administrators
 MPEG4 is not a free format. You may need to obtain a license to use this script on your server.
@@ -98,3 +107,5 @@ MPEG4 is not a free format. You may need to obtain a license to use this script 
 - - improved overall quality of images & drawings in presentations
 - - cursor rendered as in bbb playback
 - - removed chapter marks
+- 1.1.1 - 1.1.4 minor bug fixes
+- 1.2.0 dockerization of the script due to memory management
