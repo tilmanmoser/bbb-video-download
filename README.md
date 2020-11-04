@@ -25,6 +25,7 @@ sudo apt install docker docker-compose
 ```bash
 cd /opt
 git clone https://github.com/tilmanmoser/bbb-video-download.git
+cd bbb-video-download
 docker-compose build app
 ```
 
