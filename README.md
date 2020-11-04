@@ -27,12 +27,16 @@ cd /opt
 git clone https://github.com/tilmanmoser/bbb-video-download.git
 cd bbb-video-download
 docker-compose build app
+mkdir tmp
+chown bigbluebutton:bigbluebutton tmp
 ```
 
 **If** you want to run the script for every new recording automatically, install the post_publish hook like this:
 ```bash
 cd /opt/bbb-video-download
 export BBB_VIDEO_DOWNLOAD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export BBB_UID="$(cat /etc/passwd | grep bigbluebutton | cut -d: -f3)"
+export BBB_GID="$(cat /etc/passwd | grep bigbluebutton | cut -d: -f4)"
 envsubst < ./snippets/post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
 ```
 
@@ -74,7 +78,7 @@ Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation 
 Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
-docker-compose run --rm app node index.js -h
+docker-compose run --rm --user 998:998 app node index.js -h
 >usage: index.js [-h] [-v] -i INPUT -o OUTPUT
 >
 >A BigBlueButton recording postscript to provide video download capability.
@@ -91,7 +95,7 @@ docker-compose run --rm app node index.js -h
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:
 ```bash
 cd /opt/bbb-video-download
-docker-compose run --rm app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
+docker-compose run --rm --user 998:998 app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
 ```
 
 *Please note, that all directories you want to access as input or output must be mounted as volumes in docker-compose.yml. Out of the box only /var/bigbluebutton/published/presentation is mounted.*

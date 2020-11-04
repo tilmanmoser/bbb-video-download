@@ -45,7 +45,7 @@ output_file = Shellwords.escape("#{published_files}/video.mp4")
 base_dir = '${BBB_VIDEO_DOWNLOAD_DIR}'
 
 BigBlueButton.logger.info("Create downloadable video for [#{meeting_id}] start")
-rs = `cd #{base_dir} && docker-compose run --rm app node index.js -i #{input_dir} -o #{output_file}`
+rs = `cd #{base_dir} && docker-compose run --rm --user ${BBB_UID}:${BBB_GID} app node index.js -i #{input_dir} -o #{output_file}`
 BigBlueButton.logger.info(rs)
 BigBlueButton.logger.info("Create downloadable video for [#{meeting_id}] end")
 
