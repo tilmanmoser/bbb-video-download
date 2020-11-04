@@ -19,7 +19,7 @@ module.exports.createPresentationVideo = async (config, metadata) => {
     if (!slides && deskshares)
         return await onlyDeskshares(deskshares)
 
-    return await combinedSlidesAndDeskshares(slides, deskshares, config)
+    return await combinedSlidesAndDeskshares(slides, deskshares, config, metadata.duration)
 
 }
 const onlySlides = async (slides) => {
@@ -30,31 +30,37 @@ const onlyDeskshares = async (deskshares) => {
     return await getVideoInfo(deskshares.video)
 }
 
-const combinedSlidesAndDeskshares = async (slides, deskshares, config) => {
-    const filtersScriptFile = config.workdir + '/filters.txt'
-    const tmpFile = config.workdir + '/presentation.tmp.mp4'
-    const outFile = config.workdir + '/presentation.mp4'
-
-    // let dparts = ''
-    // deskshares.parts.forEach((part,index) => {dparts += '[d' + index + ']'});
-
-    // const filters = [`[1][0]scale2ref=ow*mdar:ih[d][v1];[d]split${dparts}`]
-    // deskshares.parts.forEach((part,index) => {
-    //     filters.push(`[v${filters.length}][d${index}]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
-    // })
-    const filters = []
-    deskshares.parts.forEach((part,index) => {
-        const inStream = (index == 0) ? '[0]' : '[v' + filters.length + ']'
-        filters.push(`[1]trim=${part.start}:${part.end}[d${index}];[d${index}]${inStream}scale2ref=oh*mdar:ih[do${index}][s${index}];[s${index}][do${index}]overlay=enable='between(t,${part.start},${part.end})'[v${filters.length+1}]`)
+const combinedSlidesAndDeskshares = async (slides, deskshares, config, duration) => {
+    const width = slides.viewport.width
+    const height = slides.viewport.height
+    let ts = 0
+    let videoFiles = ''
+    deskshares.parts.forEach((part, index) => {
+        // trim slides part
+        if (ts < part.start) {
+            const slidesPartVideo = 'slides_' + index + '.mp4'
+            childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${slides.video} -vcodec copy -acodec copy -ss ${ts} -to ${part.start} ${config.workdir}/${slidesPartVideo}`)
+            videoFiles += "file '" + slidesPartVideo + "'\n"
+        }
+        // trim, scale and pad deskshare part
+        const desksharePartVideo = 'deskshare_' + index + '.mp4'
+        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${deskshares.video} -ss ${part.start} -to ${part.end} -vf "scale=w=${width}:h=${height}:force_original_aspect_ratio=1,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=white" -c:v libx264 -preset ultrafast ${config.workdir}/${desksharePartVideo}`)
+        videoFiles += "file '" + desksharePartVideo + "'\n"
+        ts = part.end
     })
+    // trim last slides part
+    if (ts < duration) {
+        const slidesPartVideo = 'slides_end.mp4'
+        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1-i ${slides.video} -vcodec copy -acodec copy -ss ${ts} -to ${duration} ${config.workdir}/${slidesPartVideo}`)
+        videoFiles += "file '" + slidesPartVideo + "'\n"
+    }
 
-    fs.writeFileSync(filtersScriptFile, filters.join(";\n"))
+    // write parts to file
+    const partsTxt = config.workdir + '/presentation_parts.txt'
+    fs.writeFileSync(partsTxt, videoFiles)
 
-    const cmd = `ffmpeg -hide_banner -loglevel error -i ${slides.video} -i ${deskshares.video} -filter_complex_script ${filtersScriptFile} -map '[v${filters.length}]' -threads 1 -strict -2 ${tmpFile}`
-    childProcess.execSync(cmd)
-    if (fs.existsSync(outFile))
-        fs.unlinkSync(outFile)
-    fs.renameSync(tmpFile, outFile)
-
+    // render combined presentation video
+    const outFile = config.workdir + '/presentation.mp4'
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -f concat -i ${partsTxt} -crf 22 -pix_fmt yuv420p ${outFile}`)
     return await getVideoInfo(outFile)
 }

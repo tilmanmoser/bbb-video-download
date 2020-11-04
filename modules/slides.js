@@ -172,7 +172,7 @@ const createServer = async (basedir, port) => {
 
 const captureFrames = async (serverUrl, presentation, workdir) => {
     const browser = await puppeteer.launch({
-         /*headless: false, */
+         // headless: false,
          executablePath: '/usr/bin/chromium-browser'
         })
     const page = await browser.newPage()

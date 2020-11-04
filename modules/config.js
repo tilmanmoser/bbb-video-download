@@ -2,6 +2,7 @@ require('dotenv').config()
 const { ArgumentParser } = require('argparse');
 const { version } = require('../package.json')
 const { description } = require('../package.json')
+const fs = require('fs')
 
 const parser = new ArgumentParser({
   description: description
@@ -15,11 +16,16 @@ const arguments = parser.parse_args()
 validateArguments(arguments)
 
 module.exports.config = {
-  args: arguments
+  args: arguments,
+  format: arguments.output.split('.').pop(),
+  docker: fs.existsSync('/.dockerenv')
 }
 
 function validateArguments (arguments) {
   if (!arguments.output.endsWith('.mp4') && !arguments.output.endsWith('.webm'))
     throw new Error('Unsupported file type: ' + arguments.output)
+  
+
 }
+
 
