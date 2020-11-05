@@ -23,16 +23,27 @@ sudo apt install docker docker-compose
 
 **Installation**
 ```bash
+# (as root or with sudo)
 cd /opt
+
+## fetch source from github
 git clone https://github.com/tilmanmoser/bbb-video-download.git
 cd bbb-video-download
+
+## build app with docker-compose
 docker-compose build app
+
+## create the workdir (as referenced in docker-compose.yml) and make bigbluebutton the owner
 mkdir tmp
 chown bigbluebutton:bigbluebutton tmp
+
+## add bigbluebutton user to docker group
+usermod -aG docker bigbluebutton
 ```
 
 **If** you want to run the script for every new recording automatically, install the post_publish hook like this:
 ```bash
+# (as root or with sudo)
 cd /opt/bbb-video-download
 export BBB_VIDEO_DOWNLOAD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export BBB_UID="$(cat /etc/passwd | grep bigbluebutton | cut -d: -f3)"
@@ -73,12 +84,12 @@ sudo docker rmi --force $(docker images -q 'node' | uniq)
 
 
 ### Create downloadable videos for existing recordings
-Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation or `bbb-record --rebuildall` to reprocess all existing presentations.
+Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation or `bbb-record --rebuildall` to reprocess all existing presentations. For this the post_publish script must be installed (see installation).
 
 Alternatively you can run bbb-video-download manually:
 ```bash
 cd /opt/bbb-video-download
-docker-compose run --rm --user 998:998 app node index.js -h
+sudo -u bigbluebutton docker-compose run --rm --user 998:998 app node index.js -h
 >usage: index.js [-h] [-v] -i INPUT -o OUTPUT
 >
 >A BigBlueButton recording postscript to provide video download capability.
@@ -95,7 +106,7 @@ docker-compose run --rm --user 998:998 app node index.js -h
 Example for a published presentation with internal meeting id 9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148:
 ```bash
 cd /opt/bbb-video-download
-docker-compose run --rm --user 998:998 app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
+sudo -u bigbluebutton docker-compose run --rm --user 998:998 app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
 ```
 
 *Please note, that all directories you want to access as input or output must be mounted as volumes in docker-compose.yml. Out of the box only /var/bigbluebutton/published/presentation is mounted.*

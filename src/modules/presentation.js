@@ -33,34 +33,18 @@ const onlyDeskshares = async (deskshares) => {
 const combinedSlidesAndDeskshares = async (slides, deskshares, config, duration) => {
     const width = slides.viewport.width
     const height = slides.viewport.height
-    let ts = 0
-    let videoFiles = ''
+    const resizedDesksharesVideo = config.workdir + '/deskshare.mp4'
+    const presentationTmp = config.workdir + '/presentation.tmp.mp4'
+    const presentationOut = config.workdir + '/presentation.mp4'
+
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${deskshares.video} -vf "scale=w=${width}:h=${height}:force_original_aspect_ratio=1,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=white" -c:v libx264 -preset ultrafast ${resizedDesksharesVideo}`)
     deskshares.parts.forEach((part, index) => {
-        // trim slides part
-        if (ts < part.start) {
-            const slidesPartVideo = 'slides_' + index + '.mp4'
-            childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${slides.video} -vcodec copy -acodec copy -ss ${ts} -to ${part.start} ${config.workdir}/${slidesPartVideo}`)
-            videoFiles += "file '" + slidesPartVideo + "'\n"
-        }
-        // trim, scale and pad deskshare part
-        const desksharePartVideo = 'deskshare_' + index + '.mp4'
-        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${deskshares.video} -ss ${part.start} -to ${part.end} -vf "scale=w=${width}:h=${height}:force_original_aspect_ratio=1,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=white" -c:v libx264 -preset ultrafast ${config.workdir}/${desksharePartVideo}`)
-        videoFiles += "file '" + desksharePartVideo + "'\n"
-        ts = part.end
+        const presentationIn = (index == 0) ? slides.video : presentationOut
+        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${presentationIn} -i ${resizedDesksharesVideo} -filter_complex "[0][1]overlay=x=0:y=0:enable='between(t,${part.start},${part.end})'[out]" -map [out] -c:a copy -c:v libx264 -preset ultrafast ${presentationTmp}`)
+        if (fs.existsSync(presentationOut))
+            fs.unlinkSync(presentationOut)
+        fs.renameSync(presentationTmp, presentationOut)
     })
-    // trim last slides part
-    if (ts < duration) {
-        const slidesPartVideo = 'slides_end.mp4'
-        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1-i ${slides.video} -vcodec copy -acodec copy -ss ${ts} -to ${duration} ${config.workdir}/${slidesPartVideo}`)
-        videoFiles += "file '" + slidesPartVideo + "'\n"
-    }
 
-    // write parts to file
-    const partsTxt = config.workdir + '/presentation_parts.txt'
-    fs.writeFileSync(partsTxt, videoFiles)
-
-    // render combined presentation video
-    const outFile = config.workdir + '/presentation.mp4'
-    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -f concat -i ${partsTxt} -crf 22 -pix_fmt yuv420p ${outFile}`)
-    return await getVideoInfo(outFile)
+    return await getVideoInfo(presentationOut)
 }
