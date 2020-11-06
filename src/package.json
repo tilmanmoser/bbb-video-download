@@ -1,6 +1,6 @@
 {
   "name": "bbb-video-download",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A BigBlueButton recording postscript to provide video download capability.",
   "main": "index.js",
   "author": "Tilman Moser",
