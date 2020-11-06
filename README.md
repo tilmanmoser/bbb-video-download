@@ -83,7 +83,7 @@ sudo docker rmi --force $(docker images -q 'node' | uniq)
 ```
 
 
-### Create downloadable videos for existing recordings
+## Create downloadable videos for existing recordings
 Use `bbb-record --rebuild <presentation_id>` to reprocess a single presentation or `bbb-record --rebuildall` to reprocess all existing presentations. For this the post_publish script must be installed (see installation).
 
 Alternatively you can run bbb-video-download manually:
@@ -112,10 +112,10 @@ sudo -u bigbluebutton docker-compose run --rm --user 998:998 app node index.js -
 *Please note, that all directories you want to access as input or output must be mounted as volumes in docker-compose.yml. Out of the box only /var/bigbluebutton/published/presentation is mounted.*
 
 
-### Info for server administrators
+## Info for server administrators
 MPEG4 is not a free format. You may need to obtain a license to use this script on your server.
 
-### Version history:
+## Version history:
 - 1.0.0 initial release
 - 1.0.1 - 1.0.6 minor bug fixes
 - 1.1.0 major rewrite:
@@ -125,3 +125,7 @@ MPEG4 is not a free format. You may need to obtain a license to use this script 
 - - removed chapter marks
 - 1.1.1 - 1.1.4 minor bug fixes
 - 1.2.0 dockerization of the script due to memory management
+
+## Acknowledgement
+Special thanks go to @ichdasich, @deiflou and @christmart for providing enhancements and outstanding support in testing the application.
+
