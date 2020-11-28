@@ -21,7 +21,8 @@ const actions = {
     hideImage: 'hideImage',
     showDrawing: 'showDrawing',
     setViewBox: 'setViewBox',
-    moveCursor: 'moveCursor'
+    moveCursor: 'moveCursor',
+    hideDrawing: 'hideDrawing'
 }
 
 const parseSlidesData = async (basedir, duration) => {
@@ -101,7 +102,8 @@ const parseDrawings = (data, frames, duration) => {
                 canvas.g.forEach(element => {
                     if (element.$.timestamp < duration)
                         drawings[element.$.id] = {
-                            timestamp: element.$.timestamp
+                            timestamp: element.$.timestamp,
+                            undo: element.$.undo
                         }
                 })
             }
@@ -112,6 +114,12 @@ const parseDrawings = (data, frames, duration) => {
             action: actions.showDrawing,
             id: id
         })
+        if(drawings[id].undo != -1){
+            getFrameByTimestamp(frames, drawings[id].undo).actions.push({
+                action: actions.hideDrawing,
+                id: id
+            })
+        }
     })
 }
 
@@ -211,6 +219,9 @@ const captureFrames = async (serverUrl, presentation, workdir) => {
                 case actions.showDrawing:
                     await showDrawing(page, action.id)
                     break
+                case actions.hideDrawing:
+                    await hideDrawing(page, action.id)
+                    break
                 case actions.setViewBox:
                     await setViewBox(page, action.value)
                     break
@@ -255,6 +266,12 @@ const showDrawing = async (page, id) => {
             element.style.visibility = 'hidden'
         })
         drawing.style.visibility = 'visible'
+    }, id)
+}
+
+const hideDrawing = async (page, id) => {
+    await page.evaluate((id) => {
+        document.querySelector('#' + id).style.display = 'none'
     }, id)
 }
 
