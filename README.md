@@ -48,9 +48,12 @@ cd /opt/bbb-video-download
 export BBB_VIDEO_DOWNLOAD_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export BBB_UID="$(cat /etc/passwd | grep bigbluebutton | cut -d: -f3)"
 export BBB_GID="$(cat /etc/passwd | grep bigbluebutton | cut -d: -f4)"
-envsubst < ./snippets/post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
-```
 
+## bbb v2.2:
+envsubst < ./snippets/post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
+## bbb v2.3:
+envsubst < ./snippets/bbb23_post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
+```
 
 ## Update
 If you're updating from an older version to 1.2, please uninstall and reinstall.
