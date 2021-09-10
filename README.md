@@ -111,6 +111,10 @@ Example for a published presentation with internal meeting id 9a9b6536a10b10017f
 cd /opt/bbb-video-download
 sudo -u bigbluebutton docker-compose run --rm --user 998:998 app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
 ```
+For BigBlueButton 2.3 you have to find the according user:group (cat /etc/passwd | grep bigbluebutton)
+```bash
+sudo -u bigbluebutton docker-compose run --rm --user 997:996 app node index.js -i /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148 -o /var/bigbluebutton/published/presentation/9a9b6536a10b10017f7e849d30a026809852d01f-1597816023148/video.mp4
+```
 
 *Please note, that all directories you want to access as input or output must be mounted as volumes in docker-compose.yml. Out of the box only /var/bigbluebutton/published/presentation is mounted.*
 
