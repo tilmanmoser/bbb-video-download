@@ -119,8 +119,8 @@ sudo -u bigbluebutton docker-compose run --rm --user 997:996 app node index.js -
 *Please note, that all directories you want to access as input or output must be mounted as volumes in docker-compose.yml. Out of the box only /var/bigbluebutton/published/presentation is mounted.*
 
 
-## Info for server administrators
-MPEG4 is not a free format. You may need to obtain a license to use this script on your server.
+## Forks / projects based on this script
+- Add a download button to presentation playback https://github.com/drlight17/bbb-add-download-button
 
 ## Version history:
 - 1.0.0 initial release
