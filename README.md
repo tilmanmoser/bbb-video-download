@@ -121,6 +121,7 @@ sudo -u bigbluebutton docker-compose run --rm --user 997:996 app node index.js -
 
 ## Forks / projects based on this script
 - Add a download button to presentation playback https://github.com/drlight17/bbb-add-download-button
+- to activate downloadable recordings https://github.com/lonesomewalker/bbb-dashboard
 
 ## Version history:
 - 1.0.0 initial release
