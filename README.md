@@ -135,5 +135,5 @@ sudo -u bigbluebutton docker-compose run --rm --user 997:996 app node index.js -
 - 1.2.0 dockerization of the script due to memory management
 
 ## Acknowledgement
-Special thanks go to @ichdasich, @deiflou and @christmart for providing enhancements and outstanding support in testing the application.
+Special thanks go to @Superjamp, @ichdasich, @deiflou and @christmart for providing enhancements and outstanding support in testing the application.
 
