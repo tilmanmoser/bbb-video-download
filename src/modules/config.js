@@ -15,8 +15,8 @@ parser.add_argument('-ow', '--width', { help: 'width of output file', type: 'int
 parser.add_argument('-oh', '--height', { help: 'height of output file', type: 'int', default: 720 })
 parser.add_argument('-q', '--quality', { help: 'deviceScaleFactor of Chrome', type: 'int', default: 1  })
 parser.add_argument('--threads', { help: 'ffmpeg threads', type: 'int', default: 1 })
-parser.add_argument('--combine', { help: 'combine presentation and webcams', action:argparse.BooleanOptionalAction, default: true })
-parser.add_argument('--isOnlyAudio', { help: 'overwrite isOnlyAudio to skip isAllWhiteVideo check', action:argparse.BooleanOptionalAction })
+parser.add_argument('--combine', { help: 'combine presentation and webcams', action:ArgumentParser.BooleanOptionalAction, default: true })
+parser.add_argument('--isOnlyAudio', { help: 'overwrite isOnlyAudio to skip isAllWhiteVideo check', action:ArgumentParser.BooleanOptionalAction })
 
 const arguments = parser.parse_args()
 validateArguments(arguments)
