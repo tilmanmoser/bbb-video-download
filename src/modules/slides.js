@@ -1,6 +1,4 @@
 const fs = require('fs')
-const http = require('http')
-const getPort = require('get-port')
 const puppeteer = require('puppeteer-core')
 const childProcess = require('child_process')
 const { parseStringPromise } = require('xml2js')
@@ -158,38 +156,21 @@ const getFrameByTimestamp = (frames, timestamp) => {
 
 
 const createFrames = async (config, presentation) => {
-    const port = await getPort({ port: getPort.makeRange(3000, 3100) })
-    const server = await createServer(config.args.input, port)
-    await captureFrames(config,'http://localhost:' + port, presentation, config.workdir)
-    server.close()
+    await captureFrames(config, 'file://' + config.args.input, presentation, config.workdir)
 }
 
-const createServer = async (basedir, port) => {
-    return http.createServer((req, res) => {
-        fs.readFile(basedir + req.url, (err, data) => {
-            if (err) {
-                res.writeHead(404)
-                res.end(JSON.stringify(err))
-                return
-            }
-            res.writeHead(200)
-            res.end(data)
-        })
-    }).listen(port)
-}
-
-const captureFrames = async (config,serverUrl, presentation, workdir) => {
+const captureFrames = async (config, baseUrl, presentation, workdir) => {
     const browser = await puppeteer.launch({
-         // headless: false,
-         executablePath: '/usr/bin/chromium-browser'
-        })
+        headless: true,
+        executablePath: '/usr/bin/chromium-browser'
+    })
     const page = await browser.newPage()
     await page.setViewport({
         width: config.args.width,
         height: config.args.height,
         deviceScaleFactor: config.args.quality
     })
-    await page.goto(serverUrl + '/shapes.svg')
+    await page.goto(baseUrl + '/shapes.svg')
     await page.waitForSelector('#svgfile')
     // add cursor
     await page.evaluate(() => { 
