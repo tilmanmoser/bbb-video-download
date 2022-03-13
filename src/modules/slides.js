@@ -160,7 +160,7 @@ const getFrameByTimestamp = (frames, timestamp) => {
 const createFrames = async (config, presentation) => {
     const port = await getPort({ port: getPort.makeRange(3000, 3100) })
     const server = await createServer(config.args.input, port)
-    await captureFrames(config,'http://localhost:' + port, presentation, config.workdir)
+    await captureFrames('http://localhost:' + port, presentation, config.workdir)
     server.close()
 }
 
@@ -178,16 +178,16 @@ const createServer = async (basedir, port) => {
     }).listen(port)
 }
 
-const captureFrames = async (config,serverUrl, presentation, workdir) => {
+const captureFrames = async (serverUrl, presentation, workdir) => {
     const browser = await puppeteer.launch({
          // headless: false,
          executablePath: '/usr/bin/chromium-browser'
         })
     const page = await browser.newPage()
     await page.setViewport({
-        width: config.args.width,
-        height: config.args.height,
-        deviceScaleFactor: config.args.quality
+        width: presentation.viewport.width,
+        height: presentation.viewport.height,
+        deviceScaleFactor: 1
     })
     await page.goto(serverUrl + '/shapes.svg')
     await page.waitForSelector('#svgfile')
@@ -196,16 +196,7 @@ const captureFrames = async (config,serverUrl, presentation, workdir) => {
         let el = document.querySelector('#svgfile')
         el.innerHTML = el.innerHTML + '<circle id="cursor" cx="9999" cy="9999" r="5" stroke="red" stroke-width="3" fill="red" style="visibility:hidden" />'
     })
-    await page.evaluate(() => {
-        document.querySelector('#svgfile').setAttribute('style', 'height:100%;width:100%')
-    })
     let currentImage = {
-        width: 0,
-        height: 0
-    }
-    let currentViewBox = {
-        x: 0,
-        y: 0,
         width: 0,
         height: 0
     }
@@ -219,11 +210,6 @@ const captureFrames = async (config,serverUrl, presentation, workdir) => {
                     await showImage(page, action.id)
                     currentImage.width = action.width
                     currentImage.height = action.height
-                    await page.setViewport({
-                        width: currentImage.width,
-                        height: currentImage.height,
-                        deviceScaleFactor: config.args.quality
-                    })
                     showCursor(page)
                     break
                 case actions.hideImage:
@@ -238,18 +224,11 @@ const captureFrames = async (config,serverUrl, presentation, workdir) => {
                     break
                 case actions.setViewBox:
                     await setViewBox(page, action.value)
-                    const viewbox = action.value.split(" ")
-                    currentViewBox = {
-                        x: viewbox[0] * 1.0,
-                        y: viewbox[1] * 1.0,
-                        width: viewbox[2] * 1.0,
-                        height: viewbox[3] * 1.0,
-                    }
                     break
                 case actions.moveCursor:
                     await moveCursor(page, 
-                        currentViewBox.x + (action.value[0] * currentViewBox.width), 
-                        currentViewBox.y + (action.value[1] * currentViewBox.height)
+                        action.value[0] * currentImage.width, 
+                        action.value[1] * currentImage.height
                     )
                 default:
                     break
@@ -335,6 +314,6 @@ const renderVideo = async (config, presentation) => {
     ws += "file '" + presentation.frames[timestamps.slice(-2)[0]].capture + "'\n"
 
     fs.writeFileSync(slidesTxtFile, ws)
-    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -f concat -i ${slidesTxtFile} -threads ${config.args.threads} -y  -vf "scale=${config.args.width}:${config.args.height}:force_original_aspect_ratio=decrease,pad=${config.args.width}:${config.args.height}:(ow-iw)/2:(oh-ih)/2:color=white" -r 24 -pix_fmt yuv420p ${videoFile}`)
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -f concat -i ${slidesTxtFile} -threads 1 -y -filter_complex "[0:v]fps=24, scale=${presentation.viewport.width}:-2[out]" -map '[out]' -strict -2 -crf 22 -pix_fmt yuv420p ${videoFile}`)
     presentation.video = videoFile
 }

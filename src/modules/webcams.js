@@ -15,11 +15,7 @@ module.exports.getWebcamsVideo = async (config, duration) => {
 
     if (videoFile) {
         const videoInfo = await getVideoInfo(videoFile)
-        if(config.args.isOnlyAudio !== null) {
-            videoInfo.isOnlyAudio = config.args.isOnlyAudio
-        } else {
-            videoInfo.isOnlyAudio = await isAllWhiteVideo(videoFile, duration)
-        }
+        videoInfo.isOnlyAudio = await isAllWhiteVideo(videoFile, duration)
         return videoInfo
     }
 

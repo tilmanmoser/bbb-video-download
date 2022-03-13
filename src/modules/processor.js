@@ -23,12 +23,12 @@ module.exports.createVideo = async (config) => {
     // captions
     const captions = await createCaptions(config)
     if (captions)
-        await addCaptions(config, captions, fullVideo)
+        await addCaptions(captions, fullVideo)
 
     // copy video to destination
     if (!config.args.output.endsWith('.mp4')) {
         const suffix = config.args.output.split('.').pop()
-        await renderFinalVideo(config, fullVideo.video, config.workdir + '/final.' + suffix) 
+        await renderFinalVideo(fullVideo.video, config.workdir + '/final.' + suffix) 
         moveFile(config.workdir + '/final.' + suffix, config.args.output, config.docker)
     } else {
         moveFile(fullVideo.video, config.args.output, config.docker)
@@ -48,35 +48,35 @@ const combinePresentationWithWebcams = async (presentation, webcams, config) => 
         fs.renameSync(presentation.video, video)
     
     if (!presentation && webcams)
-        await copyWebcamsVideo(config, webcams.video, video)
+        await copyWebcamsVideo(webcams.video, video)
     
-    if (config.args.combine && !webcams.isOnlyAudio)
-        await stackWebcamsToPresentation(presentation, webcams, video)
+    if (presentation && webcams.isOnlyAudio)
+        await copyWebcamsAudioToPresentation(presentation, webcams, video)
     else
-        await copyWebcamsAudioToPresentation(config, presentation, webcams, video)
+        await stackWebcamsToPresentation(presentation, webcams, video)
 
     return getVideoInfo(video)
 }
 
-const copyWebcamsVideo = async (config, input, output) => {
-    childProcess.exec(`ffmpeg -hide_banner -loglevel error -threads ${config.args.threads} -i ${input} -y ${output}`)
+const copyWebcamsVideo = async (input, output) => {
+    childProcess.exec(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${input} -y ${ouput}`)
 }
 
-const copyWebcamsAudioToPresentation = async (config, presentation, webcams, output) => {
-    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads ${config.args.threads} -i ${presentation.video} -i ${webcams.video} -c:v copy -c:a aac -map 0:0 -map 1:1 -shortest -y ${output}`)
+const copyWebcamsAudioToPresentation = async (presentation, webcams, output) => {
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${presentation.video} -i ${webcams.video} -c:v copy -c:a aac -map 0:0 -map 1:1 -shortest -y ${output}`)
 }
 
-const stackWebcamsToPresentation = async (config, presentation, webcams, output) => {
+const stackWebcamsToPresentation = async (presentation, webcams, output) => {
         const width = presentation.width + webcams.width
         let height = Math.max(presentation.height, webcams.height)
         if (height % 2) height += 1
-        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads ${config.args.threads} -i ${presentation.video} -i ${webcams.video} -filter_complex "[0:v]pad=width=${width}:height=${height}:color=white[p];[p][1:v]overlay=x=${presentation.width}:y=0[out]" -map [out] -map 1:1 -c:a aac -shortest -y ${output}`)
+        childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${presentation.video} -i ${webcams.video} -filter_complex "[0:v]pad=width=${width}:height=${height}:color=white[p];[p][1:v]overlay=x=${presentation.width}:y=0[out]" -map [out] -map 1:1 -c:a aac -shortest -y ${output}`)
 }
 
-const addCaptions = async (config, captions, videoObject) => {
+const addCaptions = async (captions, videoObject) => {
     const tmpFile = videoObject.video + '.tmp.mp4'
 
-    let cmd = 'ffmpeg -hide_banner -loglevel error -threads ' + config.args.threads + ' -i ' + videoObject.video
+    let cmd = 'ffmpeg -hide_banner -loglevel error -threads 1 -i ' + videoObject.video
     captions.forEach(caption => { cmd += ' -i ' + caption.file})
     cmd += ' -map 0'
     captions.forEach((caption,idx) => { cmd += ` -map ${idx+1}:s`})
@@ -92,8 +92,8 @@ const addCaptions = async (config, captions, videoObject) => {
     fs.renameSync(tmpFile, videoObject.video)
 }
 
-const renderFinalVideo = async (config, input, output) => {
-    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads ${config.args.threads} -i ${input} -y ${output}`)
+const renderFinalVideo = async (input, output) => {
+    childProcess.execSync(`ffmpeg -hide_banner -loglevel error -threads 1 -i ${input} -y ${output}`)
 }
 
 const moveFile = (src,dst,isRunningInDocker) => {
