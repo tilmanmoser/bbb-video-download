@@ -51,7 +51,7 @@ const combinePresentationWithWebcams = async (presentation, webcams, config) => 
         await copyWebcamsVideo(config, webcams.video, video)
     
     if (config.args.combine && !webcams.isOnlyAudio)
-        await stackWebcamsToPresentation(presentation, webcams, video)
+        await stackWebcamsToPresentation(config, presentation, webcams, video)
     else
         await copyWebcamsAudioToPresentation(config, presentation, webcams, video)
 
