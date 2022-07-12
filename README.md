@@ -1,4 +1,5 @@
 # bbb-video-download
+
 A BigBlueButton recording postscript to provide video download capability.
 
 The assembled video includes:
@@ -9,6 +10,10 @@ The assembled video includes:
     * zooming
 * screen sharing
 * captions
+
+## Seeking for active maintainer
+
+Hi there - as time moves on, I and my company are not using BigBlueButton on a regular basis with own self-hosted instances anymore. Therefor my engagement in this project is stalling. Hence, I'm looking for an active maintainer, who is actively using this project and willing to update it along with new bbb versions. An active handover (joined code review) can be arranged.
 
 
 ## Install
