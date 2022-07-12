@@ -53,6 +53,8 @@ export BBB_GID="$(cat /etc/passwd | grep bigbluebutton | cut -d: -f4)"
 envsubst < ./snippets/post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
 ## bbb v2.3:
 envsubst < ./snippets/bbb23_post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
+## bbb v2.3 with Ruby 2.7
+envsubst < ./snippets/bbb23_ruby27_post_publish_bbb_video_download.rb.template > /usr/local/bigbluebutton/core/scripts/post_publish/a0_post_publish_bbb_video_download.rb
 ```
 
 ## Update
